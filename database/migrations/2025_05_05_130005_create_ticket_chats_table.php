@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('ticket_chats', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
-            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');   // who sent the message
-            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade'); // who receives the message
+            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
             $table->text('message');
             $table->boolean('is_read')->default(false);
             $table->timestamps();
