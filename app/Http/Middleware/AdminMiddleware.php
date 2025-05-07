@@ -19,6 +19,8 @@ class AdminMiddleware
             return $next($request);
         }
 
-        abort(403, 'Unauthorized');
+        return response()->json([
+            'message' => 'Unauthorized. Admin access only.'
+        ], 403);
     }
 }

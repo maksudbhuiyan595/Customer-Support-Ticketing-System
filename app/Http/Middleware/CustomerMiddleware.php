@@ -19,6 +19,8 @@ class CustomerMiddleware
             return $next($request);
         }
 
-        abort(403, 'Unauthorized');
+        return response()->json([
+            'message' => 'Unauthorized.'
+        ], 403);
     }
 }

@@ -19,6 +19,9 @@ return new class extends Migration
             $table->enum('priority',['Low','Medium','High'])->default('High');
             $table->string('attachment')->nullable();
             $table->enum('status',['Open','In-progress','Resolved','Closed'])->default('Open');
+            
+            $table->index('status');    
+            $table->index('category'); 
             $table->timestamps();
         });
     }
