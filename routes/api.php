@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,4 +18,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 });
 Route::middleware(['auth:sanctum', 'customer'])->group(function () {
     Route::apiResource('tickets', TicketController::class)->only('index');
+});
+Route::middleware(['auth:sanctum', 'customer'])->group(function () {
+    Route::apiResource('comments', CommentController::class)->only(['store', 'index']);
 });
