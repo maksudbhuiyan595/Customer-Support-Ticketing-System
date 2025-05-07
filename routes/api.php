@@ -11,5 +11,10 @@ Route::group(['controller' => UserAuthController::class], function () {
     Route::post('login', 'login');
     Route::post('logout', 'logout')->middleware('auth:sanctum');
 });
-Route::apiResource('tickets', TicketController::class)->middleware(['auth:sanctum', 'admin']);
-Route::apiResource('tickets', TicketController::class)->only('index')->middleware(['auth:sanctum', 'customer']);
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::apiResource('tickets', TicketController::class);
+    Route::patch('update-status', [TicketController::class, 'updateStatus']);
+});
+Route::middleware(['auth:sanctum', 'customer'])->group(function () {
+    Route::apiResource('tickets', TicketController::class)->only('index');
+});

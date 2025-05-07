@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TicketRequest;
+use App\Http\Requests\TicketStatusRequst;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
@@ -54,5 +55,19 @@ class TicketController extends Controller
             return $this->sendError('An error occurred: ' . $e->getMessage(), [], 500);
         }
     }
-
+    public function updateStatus(TicketStatusRequst $request)
+    {
+        try {
+            $validated = $request->validated();
+            $ticket = Ticket::find($request->ticket_id);
+            if (!$ticket) {
+                return $this->sendError('Ticket not found.', [], 404);
+            }
+            $ticket->status = $validated['status'];
+            $ticket->save();
+            return $this->sendResponse($ticket, 'Ticket status updated successfully.');
+        } catch (\Exception $e) {
+            return $this->sendError('An error occurred: ' . $e->getMessage(), [], 500);
+        }
+    }    
 }
