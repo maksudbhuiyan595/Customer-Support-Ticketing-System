@@ -18,7 +18,6 @@ class CustomerMiddleware
         if (auth()->check() && in_array(auth()->user()->role, ['ADMIN', 'CUSTOMER'])) {
             return $next($request);
         }
-
         return response()->json([
             'message' => 'Unauthorized.'
         ], 403);

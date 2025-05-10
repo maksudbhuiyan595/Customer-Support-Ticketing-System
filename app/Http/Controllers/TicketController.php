@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TicketRequest;
+use App\Http\Requests\TicketStatusRequst;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
-    public function index()
+      public function index()
     {
         try {
             $tickets = Ticket::orderBy("created_at","desc")->get();
@@ -54,5 +55,4 @@ class TicketController extends Controller
             return $this->sendError('An error occurred: ' . $e->getMessage(), [], 500);
         }
     }
-
 }
