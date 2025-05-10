@@ -3,9 +3,9 @@
 use App\Http\Controllers\CommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\ChatController;
 
 Route::group(['controller' => UserAuthController::class], function () {
     Route::post('register', 'register');
@@ -21,4 +21,9 @@ Route::middleware(['auth:sanctum', 'customer'])->group(function () {
 });
 Route::middleware(['auth:sanctum', 'customer'])->group(function () {
     Route::apiResource('comments', CommentController::class)->only(['store', 'index']);
+});
+Route::middleware(['auth:sanctum','customer'])->group(function () {
+    Route::get('get-chat', [ChatController::class, 'index']);
+    Route::post('chats', [ChatController::class, 'store']);
+    Route::post('chats-mark-as-read', [ChatController::class, 'markAsRead']);
 });
