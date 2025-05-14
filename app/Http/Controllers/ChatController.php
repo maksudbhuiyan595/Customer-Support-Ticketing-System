@@ -10,32 +10,24 @@ class ChatController extends Controller
 public function index(Request $request)
 {
     try {
-        $user = $request->user(); // Authenticated user
-
-        // Fetch all messages where the user is either sender or receiver
+        $user = $request->user();
         $messages = Chat::with('sender')
             ->where(function ($query) use ($user) {
                 $query->where('receiver_id', $user->id)
                       ->orWhere('sender_id', $user->id);
             })
             ->get();
-
-        // Separate messages into sent and received
         $sentMessages = $messages->where('sender_id', $user->id)->values();
         $receivedMessages = $messages->where('receiver_id', $user->id)->values();
-
         $formatted = [
             'sent_messages' => $sentMessages,
             'received_messages' => $receivedMessages,
         ];
-
         return $this->sendResponse($formatted, 'Chat messages retrieved successfully.');
     } catch (\Exception $e) {
         return $this->sendError('Failed to fetch chat messages.', ['error' => $e->getMessage()], 500);
     }
 }
-
-
 public function store(Request $request)
 {
     try {
