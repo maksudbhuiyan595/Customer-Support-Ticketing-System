@@ -10,20 +10,31 @@ class ChatController extends Controller
 public function index(Request $request)
 {
     try {
-        $user = $request->user(); // Get authenticated user
+        $user = $request->user(); // Authenticated user
 
+        // Fetch all messages where the user is either sender or receiver
         $messages = Chat::with('sender')
-            ->where('receiver_id', $user->id)
-            ->orWhere('sender_id', $user->id)
-            ->latest()
+            ->where(function ($query) use ($user) {
+                $query->where('receiver_id', $user->id)
+                      ->orWhere('sender_id', $user->id);
+            })
             ->get();
 
+        // Separate messages into sent and received
+        $sentMessages = $messages->where('sender_id', $user->id)->values();
+        $receivedMessages = $messages->where('receiver_id', $user->id)->values();
 
-        return $this->sendResponse($messages, 'Chat messages retrieved successfully.');
+        $formatted = [
+            'sent_messages' => $sentMessages,
+            'received_messages' => $receivedMessages,
+        ];
+
+        return $this->sendResponse($formatted, 'Chat messages retrieved successfully.');
     } catch (\Exception $e) {
         return $this->sendError('Failed to fetch chat messages.', ['error' => $e->getMessage()], 500);
     }
 }
+
 
 public function store(Request $request)
 {
@@ -37,7 +48,7 @@ public function store(Request $request)
         $chat = Chat::create([
             'sender_id' => auth()->id(),
             'receiver_id' => $request->receiver_id,
-            'sender_type' => auth()->user()->is_admin ? 'admin' : 'customer',
+            'sender_type' => auth()->user()->role ? 'admin' : 'customer',
             'receiver_type' => $request->receiver_type,
             'message' => $request->message,
         ]);
