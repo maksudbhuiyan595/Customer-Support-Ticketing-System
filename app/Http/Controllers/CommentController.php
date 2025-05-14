@@ -8,10 +8,12 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+
         try {
-            $comments = Comment::with(['user'])->where('user_id', auth()->id())->orderByDesc('id')->get();
+            $comments = Comment::with(['user'])
+           ->where('ticket_id',$request->id)->orderByDesc('id')->get();
             return $this->sendResponse($comments, 'Comments retrieved successfully.');
         } catch (\Exception $e) {
             return $this->sendError('An error occurred: ' . $e->getMessage(), [], 500);
@@ -30,5 +32,5 @@ class CommentController extends Controller
         } catch (\Exception $e) {
             return $this->sendError('An error occurred: ' . $e->getMessage(), [], 500);
         }
-    }   
+    }
 }
