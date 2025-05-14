@@ -10,42 +10,16 @@ class ChatController extends Controller
 public function index(Request $request)
 {
     try {
-        $request->validate([
-            'receiver_id' => 'required|exists:users,id',
-        ]);
+        $user = $request->user(); // Get authenticated user
 
-        $chats = Chat::with(['sender', 'receiver'])
-            ->where(function ($q) use ($request) {
-                $q->where('sender_id', auth()->id())
-                  ->where('receiver_id', $request->receiver_id);
-            })
-            ->orWhere(function ($q) use ($request) {
-                $q->where('sender_id', $request->receiver_id)
-                  ->where('receiver_id', auth()->id());
-            })
-            ->orderBy('created_at')
+        $messages = Chat::with('sender')
+            ->where('receiver_id', $user->id)
+            ->orWhere('sender_id', $user->id)
+            ->latest()
             ->get();
 
-        $formattedChats = $chats->map(function ($chat) {
-            return [
-                'id' => $chat->id,
-                'message' => $chat->message,
-                'is_read' => (bool) $chat->is_read,
-                'created_at' => $chat->created_at->format('Y-m-d H:i:s'),
-                'sender' => [
-                    'id' => $chat->sender->id ?? null,
-                    'name' => $chat->sender->name ?? null,
-                    'type' => $chat->sender->is_admin ? 'admin' : 'customer',
-                ],
-                'receiver' => [
-                    'id' => $chat->receiver->id ?? null,
-                    'name' => $chat->receiver->name ?? null,
-                    'type' => $chat->receiver->is_admin ? 'admin' : 'customer',
-                ],
-            ];
-        });
 
-        return $this->sendResponse($formattedChats, 'Chat messages retrieved successfully.');
+        return $this->sendResponse($messages, 'Chat messages retrieved successfully.');
     } catch (\Exception $e) {
         return $this->sendError('Failed to fetch chat messages.', ['error' => $e->getMessage()], 500);
     }
